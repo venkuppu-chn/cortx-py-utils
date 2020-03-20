@@ -21,12 +21,12 @@ from typing import Any, Union
 
 from schematics.exceptions import ValidationError, ConversionError
 
-from eos.utils.errors import DataAccessInternalError
-from eos.utils.data.access import BaseModel
-from eos.utils.data.access import IDataBase, Query, IFilterTreeVisitor
-from eos.utils.data.access import ExtQuery
-from eos.utils.data.access import IFilter
-from eos.utils.data.access.filters import (FilterOperationCompare, FilterOperationOr,
+from eos_utils.errors import DataAccessInternalError
+from eos_utils.data.access import BaseModel
+from eos_utils.data.access import IDataBase, Query, IFilterTreeVisitor
+from eos_utils.data.access import ExtQuery
+from eos_utils.data.access import IFilter
+from eos_utils.data.access.filters import (FilterOperationCompare, FilterOperationOr,
                                            FilterOperationAnd, Compare)
 
 

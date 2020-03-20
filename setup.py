@@ -19,7 +19,7 @@ import os
 import sys
 from setuptools import setup
 
-SPEC_DIR = "src/utils/ha/specs/"
+SPEC_DIR = "src/ha/specs/"
 _ROOT = os.path.abspath(os.path.dirname(__file__)) + "/" + SPEC_DIR
 specs = []
 for root, directories, filenames in os.walk(_ROOT):
@@ -39,21 +39,21 @@ setup(name='eos-py-utils',
       author='Alexander Voronov',
       author_email='alexander.voronov@seagate.com',
       description='Common Python utilities for EOS',
-      package_dir={'eos': 'src'},
-      packages=['eos', 'eos.utils',
-                'eos.utils.data', 'eos.utils.data.access', 'eos.utils.data.db',
-                'eos.utils.data.db.consul_db', 'eos.utils.data.db.elasticsearch_db',
-                'eos.utils.security', 'eos.utils.schema', 'eos.utils.ha'],
+      package_dir={'eos_utils': 'src'},
+      packages=['eos_utils',
+                'eos_utils.data', 'eos_utils.data.access', 'eos_utils.data.db',
+                'eos_utils.data.db.consul_db', 'eos_utils.data.db.elasticsearch_db',
+                'eos_utils.security', 'eos_utils.schema', 'eos_utils.ha'],
       package_data={
         'eos': ['py.typed'],
       },
       entry_points={
         'console_scripts': [
-            'hac = eos.utils.ha.hac:main'
+            'hac = eos_utils.ha.hac:main'
         ]
       },
       data_files = [ ('/var/lib/eos/ha/specs', specs),
-                     ('/var/lib/eos/ha', ['src/utils/ha/args.yaml']) ],
+                     ('/var/lib/eos/ha', ['src/ha/args.yaml']) ],
       long_description=long_description,
       zip_safe=False,
       python_requires='>=3.6.8',

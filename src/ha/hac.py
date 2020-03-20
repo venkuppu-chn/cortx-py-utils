@@ -23,7 +23,7 @@ import sys
 import traceback
 import argparse
 from datetime import datetime
-from eos.utils.schema.conf import Conf
+from eos_utils.schema.conf import Conf
 
 def usage():
     return """
@@ -47,9 +47,9 @@ $ hac --generate compiled.json --output eos_pcs.sh --target pcs
 
 
 def main():
-    from eos.utils.ha.compile import Compiler
-    from eos.utils.ha import generate
-    from eos.utils.ha import const
+    from eos_utils.ha.compile import Compiler
+    from eos_utils.ha import generate
+    from eos_utils.ha import const
 
     provider = {
         "pcs": generate.PCSGenerator,

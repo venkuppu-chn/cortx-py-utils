@@ -17,4 +17,4 @@
  ****************************************************************************
 """
 
-from eos.utils.data.db.consul_db.storage import ConsulDB
+from eos_utils.data.db.consul_db.storage import ConsulDB

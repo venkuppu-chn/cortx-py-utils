@@ -20,10 +20,10 @@
 
 from abc import ABC, abstractmethod
 from typing import Type, Union, Any
-from eos.utils.data.access import Query
-from eos.utils.data.access import ExtQuery
-from eos.utils.data.access import IFilter
-from eos.utils.data.access import BaseModel
+from eos_utils.data.access import Query
+from eos_utils.data.access import ExtQuery
+from eos_utils.data.access import IFilter
+from eos_utils.data.access import BaseModel
 
 
 class IDataBase(ABC):

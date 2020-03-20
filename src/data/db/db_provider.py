@@ -27,11 +27,11 @@ from typing import Type
 from schematics import Model
 from schematics.types import DictType, StringType, ListType, ModelType, IntType
 
-from eos.utils.data.access import BaseModel
-from eos.utils.errors import MalformedConfigurationError, DataAccessInternalError
-from eos.utils.data.access import AbstractDataBaseProvider
+from eos_utils.data.access import BaseModel
+from eos_utils.errors import MalformedConfigurationError, DataAccessInternalError
+from eos_utils.data.access import AbstractDataBaseProvider
 
-import eos.utils.data.db as db_module
+import eos_utils.data.db as db_module
 
 
 DEFAULT_HOST = "127.0.0.1"

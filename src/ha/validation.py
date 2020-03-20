@@ -23,7 +23,7 @@ import json
 import inspect
 import networkx as nx
 
-from eos.utils.ha import const
+from eos_utils.ha import const
 
 class Validator:
     def __init__(self):

@@ -21,9 +21,9 @@ import asyncio
 from datetime import datetime, timezone
 from schematics.types import (IntType, StringType, BooleanType, DateTimeType)
 
-from eos.utils.data.db.db_provider import (DataBaseProvider, GeneralConfig)
-from eos.utils.data.access.filters import Compare, And, Or
-from eos.utils.data.access import BaseModel, Query, SortOrder
+from eos_utils.data.db.db_provider import (DataBaseProvider, GeneralConfig)
+from eos_utils.data.access.filters import Compare, And, Or
+from eos_utils.data.access import BaseModel, Query, SortOrder
 
 
 class AlertModel(BaseModel):
@@ -153,7 +153,7 @@ async def example():
         },
         "models": [
             {
-                "import_path": "eos.utils.data.db.examples.elasticsearch_storage.AlertModel",
+                "import_path": "eos_utils.data.db.examples.elasticsearch_storage.AlertModel",
                 "database": "es_db",
                 "config": {
                     "es_db":

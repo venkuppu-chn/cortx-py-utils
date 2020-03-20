@@ -17,7 +17,7 @@
  ****************************************************************************
 """
 import os
-from eos.utils.schema.payload import *
+from eos_utils.schema.payload import *
 
 class Conf:
     ''' Represents conf file - singleton '''

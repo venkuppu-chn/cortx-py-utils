@@ -31,13 +31,13 @@ from consul.aio import Consul
 from schematics.types import BaseType, StringType
 from schematics.exceptions import ConversionError
 
-from eos.utils.data.access import Query, SortOrder, IDataBase
-from eos.utils.data.access import ExtQuery
-from eos.utils.data.db import GenericDataBase, GenericQueryConverter
-from eos.utils.data.access import BaseModel
-from eos.utils.errors import DataAccessExternalError, DataAccessInternalError
-from eos.utils.data.access.filters import FilterOperationCompare
-from eos.utils.data.access.filters import ComparisonOperation, IFilter
+from eos_utils.data.access import Query, SortOrder, IDataBase
+from eos_utils.data.access import ExtQuery
+from eos_utils.data.db import GenericDataBase, GenericQueryConverter
+from eos_utils.data.access import BaseModel
+from eos_utils.errors import DataAccessExternalError, DataAccessInternalError
+from eos_utils.data.access.filters import FilterOperationCompare
+from eos_utils.data.access.filters import ComparisonOperation, IFilter
 
 CONSUL_ROOT = "eos/base"
 OBJECT_DIR = "obj"
@@ -203,7 +203,7 @@ class ConsulDB(GenericDataBase):
 
         if not isinstance(model, type) or not issubclass(model, BaseModel):
             raise DataAccessInternalError("Model parameter is not a Class object or not inherited "
-                                          "from eos.utils.data.access.BaseModel")
+                                          "from eos_utils.data.access.BaseModel")
         self._model = model  # Needed to build returning objects
 
         # self._query_service = ConsulQueryService(self._collection, self._consul_client,

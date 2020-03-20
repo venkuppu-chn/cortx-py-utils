@@ -21,7 +21,7 @@
 from abc import ABC, abstractmethod
 from enum import Enum
 from typing import List, Any
-from eos.utils.errors import MalformedQueryError
+from eos_utils.errors import MalformedQueryError
 
 
 class IFilter(ABC):

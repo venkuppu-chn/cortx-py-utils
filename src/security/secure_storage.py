@@ -18,11 +18,11 @@
 
 from schematics.types import StringType
 
-from eos.utils.security.cipher import Cipher
-from eos.utils.data.access.base_model import BaseModel
-from eos.utils.data.access.filters import Compare
-from eos.utils.data.access.queries import Query
-from eos.utils.data.access.storage import AbstractDataBaseProvider
+from eos_utils.security.cipher import Cipher
+from eos_utils.data.access.base_model import BaseModel
+from eos_utils.data.access.filters import Compare
+from eos_utils.data.access.queries import Query
+from eos_utils.data.access.storage import AbstractDataBaseProvider
 
 
 class NamedEncryptedBytes(BaseModel):

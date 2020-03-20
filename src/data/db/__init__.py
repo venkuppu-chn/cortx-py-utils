@@ -18,6 +18,6 @@
  ****************************************************************************
 """
 
-from eos.utils.data.db.generic_storage import GenericDataBase, GenericQueryConverter
-from eos.utils.data.db.elasticsearch_db import ElasticSearchDB
-from eos.utils.data.db.consul_db import ConsulDB
+from eos_utils.data.db.generic_storage import GenericDataBase, GenericQueryConverter
+from eos_utils.data.db.elasticsearch_db import ElasticSearchDB
+from eos_utils.data.db.consul_db import ConsulDB

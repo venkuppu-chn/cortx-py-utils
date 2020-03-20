@@ -33,14 +33,14 @@ from schematics.types import (StringType, DecimalType, DateType, IntType, BaseTy
                               DateTimeType, UTCDateTimeType, FloatType, LongType, NumberType, ListType)
 from schematics.exceptions import ConversionError
 
-from eos.utils.errors import InternalError
-from eos.utils.data.access import Query, SortOrder, IDataBase
-from eos.utils.data.access import ExtQuery
-from eos.utils.data.db import GenericDataBase, GenericQueryConverter
-from eos.utils.data.access import BaseModel
-from eos.utils.errors import DataAccessExternalError, DataAccessInternalError
-from eos.utils.data.access.filters import FilterOperationCompare
-from eos.utils.data.access.filters import ComparisonOperation, IFilter
+from eos_utils.errors import InternalError
+from eos_utils.data.access import Query, SortOrder, IDataBase
+from eos_utils.data.access import ExtQuery
+from eos_utils.data.db import GenericDataBase, GenericQueryConverter
+from eos_utils.data.access import BaseModel
+from eos_utils.errors import DataAccessExternalError, DataAccessInternalError
+from eos_utils.data.access.filters import FilterOperationCompare
+from eos_utils.data.access.filters import ComparisonOperation, IFilter
 
 
 __all__ = ["ElasticSearchDB"]
@@ -326,7 +326,7 @@ class ElasticSearchDB(GenericDataBase):
 
         if not isinstance(model, type) or BaseModel not in model.__bases__:
             raise DataAccessInternalError("Model parameter is not a Class object or not inherited "
-                                          "from eos.utils.data.access.BaseModel")
+                                          "from eos_utils.data.access.BaseModel")
         self._model = model  # Needed to build returning objects
 
         self._index_info = None

@@ -17,4 +17,4 @@
  ****************************************************************************
 """
 
-from eos.utils.data.db.elasticsearch_db.storage import ElasticSearchDB
+from eos_utils.data.db.elasticsearch_db.storage import ElasticSearchDB
