@@ -88,7 +88,7 @@ def main():
             com.create_script()
     except Exception as e:
         #TODO: print traceback error properly
-        with open(const.HAC_LOG, "a") as log:
+        with open(const.HAC_LOG, "w") as log:
             current_time = str(datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
             log.writelines(current_time + ":"+ str(traceback.format_exc()))
         print('Error: ' + str(e), file=sys.stderr)
