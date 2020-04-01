@@ -8,9 +8,12 @@
                 "interval": "10s",
                 "timeouts": [ "10s", "10s", "10s" ]
             },
+            "metadata": {
+                "failure-timeout": "20s"
+            },
             "dependencies": {
                 "predecessors" : ["ip-c1"],
-                "colocation" : [],
+                "colocation" : ["ip-c1"],
                 "relation" : []
             },
             "ha": {
@@ -29,9 +32,12 @@
                 "interval": "10s",
                 "timeouts": [ "10s", "10s", "10s" ]
             },
+            "metadata": {
+                "failure-timeout": "20s"
+            },
             "dependencies": {
                 "predecessors" : ["ip-c2"],
-                "colocation" : [],
+                "colocation" : ["ip-c2"],
                 "relation" : []
             },
             "ha": {

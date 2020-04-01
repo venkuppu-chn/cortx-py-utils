@@ -8,6 +8,9 @@
                 "interval": "30s",
                 "timeouts": [ "30s", "30s", "30s" ]
             },
+            "metadata": {
+                "failure-timeout": "60s"
+            },
             "dependencies": {
                 "predecessors" : [],
                 "colocation" : [],

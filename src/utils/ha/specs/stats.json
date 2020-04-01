@@ -8,8 +8,11 @@
                 "interval": "10s",
                 "timeouts": [ "10s", "10s", "10s" ]
             },
+            "metadata": {
+                "failure-timeout": "20s"
+            },
             "dependencies": {
-                "predecessors" : [],
+                "predecessors" : ["els-search"],
                 "colocation" : [],
                 "relation" : []
             },

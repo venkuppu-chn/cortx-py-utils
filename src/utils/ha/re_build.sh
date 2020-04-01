@@ -29,5 +29,7 @@ hac --generate /var/lib/eos/ha/compiled.json  --output /var/lib/eos/ha/script/s3
 
 hac --generate /var/lib/eos/ha/compiled.json  --output /var/lib/eos/ha/script/sspl.sh --args /var/lib/eos/ha/args.yaml --resources "sspl"
 
-hac --generate /var/lib/eos/ha/compiled.json  --output /var/lib/eos/ha/script/csm.sh --args /var/lib/eos/ha/args.yaml --resources "kibana-vip"
+hac --generate /var/lib/eos/ha/compiled.json  --output /var/lib/eos/ha/script/csm_vip.sh --args /var/lib/eos/ha/args.yaml --resources "kibana-vip"
+
+hac --generate /var/lib/eos/ha/compiled.json  --output /var/lib/eos/ha/script/csm_web.sh --args /var/lib/eos/ha/args.yaml --resources "csm-web"
 

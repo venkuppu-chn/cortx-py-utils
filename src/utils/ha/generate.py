@@ -144,7 +144,7 @@ class PCSGenerator(Generator):
         """
         self._resource_create = Template("echo $$pcs_status | grep -q $resource || "+
             "pcs -f $cluster_cfg resource create $resource "+
-            "$provider $param meta failure-timeout=$fail_tout "+
+            "$provider $param $metadata "+
             "op monitor timeout=$mon_tout interval=$mon_in op start "+
             "timeout=$sta_tout op stop timeout=$sto_tout")
         self._active_active = Template("echo $$pcs_status | grep -q $resource || "+
@@ -191,9 +191,12 @@ class PCSGenerator(Generator):
         params = ""
         if "parameters" in self._resource_set[res].keys():
             for parameter in self._resource_set[res]["parameters"].keys():
-                params = params + parameter+ "=" +self._resource_set[res]["parameters"][parameter]
-                params = params + " "
+                params = params + parameter+ "=" +self._resource_set[res]["parameters"][parameter] + " "
         timeout_list = [int(x.replace("s",""))*2 for x in self._resource_set[res]["provider"]["timeouts"]]
+        meta_param = ""
+        if "metadata" in self._resource_set[res]:
+            for meta in self._resource_set[res]["metadata"].keys():
+                meta_param = meta_param + meta+ "=" + str(self._resource_set[res]["metadata"][meta]) + " "
         resource = self._resource_create.substitute(
                     cluster_cfg=self._cluster_cfg,
                     resource=res,
@@ -203,7 +206,7 @@ class PCSGenerator(Generator):
                     mon_in=self._resource_set[res]["provider"]["interval"],
                     sta_tout=self._resource_set[res]["provider"]["timeouts"][0],
                     sto_tout=self._resource_set[res]["provider"]["timeouts"][2],
-                    fail_tout=str(max(timeout_list)) + "s"
+                    metadata="meta " + meta_param
                 )
         with open(self._script, "a") as f:
             f.writelines(resource+ "\n")

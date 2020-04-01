@@ -8,6 +8,9 @@
                 "interval": "10s",
                 "timeouts": [ "10s", "10s", "10s" ]
             },
+            "metadata": {
+                "failure-timeout": "20s"
+            },
             "dependencies": {
                 "predecessors" : [],
                 "colocation" : [],
@@ -36,6 +39,9 @@
                 "interval": "30s",
                 "timeouts": [ "30s", "30s", "30s" ]
             },
+            "metadata": {
+                "failure-timeout": "60s"
+            },
             "dependencies": {
                 "predecessors" : ["ip-c1", "ip-c2"],
                 "colocation" : ["ip-c1"],
@@ -60,6 +66,9 @@
                 "service": "lnet",
                 "interval": "30s",
                 "timeouts": [ "30s", "30s", "30s" ]
+            },
+            "metadata": {
+                "failure-timeout": "60s"
             },
             "dependencies": {
                 "predecessors" : ["ip-c1", "ip-c2"],

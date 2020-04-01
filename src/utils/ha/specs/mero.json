@@ -8,6 +8,9 @@
                 "interval": "10s",
                 "timeouts": [ "10s", "10s", "10s" ]
             },
+            "metadata": {
+                "failure-timeout": "20s"
+            },
             "dependencies": {
                 "predecessors" : ["lnet-c1", "lnet-c2"],
                 "colocation" : [],
@@ -32,6 +35,9 @@
                 "interval": "30s",
                 "timeouts": [ "600s", "600s", "600s" ]
             },
+            "metadata": {
+                "failure-timeout": "1200s"
+            },
             "dependencies": {
                 "predecessors" : ["lnet-c1", "lnet-c2"],
                 "colocation" : ["lnet-c1"],
@@ -52,6 +58,9 @@
                 "service": "m0d",
                 "interval": "30s",
                 "timeouts": [ "600s", "600s", "600s" ]
+            },
+            "metadata": {
+                "failure-timeout": "1200s"
             },
             "dependencies": {
                 "predecessors" : ["lnet-c1", "lnet-c2"],
@@ -74,6 +83,9 @@
                 "interval": "600s",
                 "timeouts": [ "600s", "600s", "600s" ]
             },
+            "metadata": {
+                "failure-timeout": "1200s"
+            },
             "dependencies": {
                 "predecessors" : ["mero-confd-c1", "mero-confd-c2"],
                 "colocation" : ["mero-confd-c1"],
@@ -94,6 +106,9 @@
                 "service": "mero_ios_c2",
                 "interval": "600s",
                 "timeouts": [ "600s", "600s", "600s" ]
+            },
+            "metadata": {
+                "failure-timeout": "1200s"
             },
             "dependencies": {
                 "predecessors" : ["mero-confd-c1", "mero-confd-c2"],

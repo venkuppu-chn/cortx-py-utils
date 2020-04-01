@@ -8,6 +8,10 @@
                 "interval": "10s",
                 "timeouts": [ "10s", "10s", "10s" ]
             },
+            "metadata": {
+                "failure-timeout": "20s",
+                "migration-threshold": 10
+            },
             "dependencies": {
                 "predecessors" : ["consul-c1", "rabbitmq"],
                 "colocation" : ["consul-c1"],

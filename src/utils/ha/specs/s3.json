@@ -8,6 +8,9 @@
                 "interval": "30s",
                 "timeouts": [ "30s", "30s", "30s" ]
             },
+            "metadata": {
+                "failure-timeout": "60s"
+            },
             "dependencies": {
                 "predecessors" : ["ldap"],
                 "colocation" : [],
@@ -32,6 +35,9 @@
                 "interval": "30s",
                 "timeouts": [ "30s", "30s", "30s" ]
             },
+            "metadata": {
+                "failure-timeout": "60s"
+            },
             "dependencies": {
                 "predecessors" : ["rabbitmq"],
                 "colocation" : [],
@@ -55,6 +61,9 @@
                 "service": "s3backgroundproducer",
                 "interval": "30s",
                 "timeouts": [ "30s", "30s", "30s" ]
+            },
+            "metadata": {
+                "failure-timeout": "60s"
             },
             "dependencies": {
                 "predecessors" : ["rabbitmq"],

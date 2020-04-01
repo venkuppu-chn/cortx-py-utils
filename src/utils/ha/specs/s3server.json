@@ -8,6 +8,9 @@
                 "interval": "10s",
                 "timeouts": [ "10s", "10s", "10s" ]
             },
+            "metadata": {
+                "failure-timeout": "20s"
+            },
             "dependencies": {
                 "predecessors" : ["s3auth", "mero-ios-c1"],
                 "colocation" : [],
@@ -28,6 +31,9 @@
                 "service": "s3server",
                 "interval": "10s",
                 "timeouts": [ "10s", "10s", "10s" ]
+            },
+            "metadata": {
+                "failure-timeout": "20s"
             },
             "dependencies": {
                 "predecessors" : ["s3auth", "mero-ios-c1"],
@@ -50,6 +56,9 @@
                 "interval": "10s",
                 "timeouts": [ "10s", "10s", "10s" ]
             },
+            "metadata": {
+                "failure-timeout": "20s"
+            },
             "dependencies": {
                 "predecessors" : ["s3auth", "mero-ios-c1"],
                 "colocation" : [],
@@ -70,6 +79,9 @@
                 "service": "s3server",
                 "interval": "10s",
                 "timeouts": [ "10s", "10s", "10s" ]
+            },
+            "metadata": {
+                "failure-timeout": "20s"
             },
             "dependencies": {
                 "predecessors" : ["s3auth", "mero-ios-c1"],
@@ -92,6 +104,9 @@
                 "interval": "10s",
                 "timeouts": [ "10s", "10s", "10s" ]
             },
+            "metadata": {
+                "failure-timeout": "20s"
+            },
             "dependencies": {
                 "predecessors" : ["s3auth", "mero-ios-c1"],
                 "colocation" : [],
@@ -112,6 +127,9 @@
                 "service": "s3server",
                 "interval": "10s",
                 "timeouts": [ "10s", "10s", "10s" ]
+            },
+            "metadata": {
+                "failure-timeout": "20s"
             },
             "dependencies": {
                 "predecessors" : ["s3auth", "mero-ios-c1"],
@@ -134,6 +152,9 @@
                 "interval": "10s",
                 "timeouts": [ "10s", "10s", "10s" ]
             },
+            "metadata": {
+                "failure-timeout": "20s"
+            },
             "dependencies": {
                 "predecessors" : ["s3auth", "mero-ios-c1"],
                 "colocation" : [],
@@ -154,6 +175,9 @@
                 "service": "s3server",
                 "interval": "10s",
                 "timeouts": [ "10s", "10s", "10s" ]
+            },
+            "metadata": {
+                "failure-timeout": "20s"
             },
             "dependencies": {
                 "predecessors" : ["s3auth", "mero-ios-c1"],
@@ -176,6 +200,9 @@
                 "interval": "10s",
                 "timeouts": [ "10s", "10s", "10s" ]
             },
+            "metadata": {
+                "failure-timeout": "20s"
+            },
             "dependencies": {
                 "predecessors" : ["s3auth", "mero-ios-c1"],
                 "colocation" : [],
@@ -196,6 +223,9 @@
                 "service": "s3server",
                 "interval": "10s",
                 "timeouts": [ "10s", "10s", "10s" ]
+            },
+            "metadata": {
+                "failure-timeout": "20s"
             },
             "dependencies": {
                 "predecessors" : ["s3auth", "mero-ios-c1"],
@@ -218,6 +248,9 @@
                 "interval": "10s",
                 "timeouts": [ "10s", "10s", "10s" ]
             },
+            "metadata": {
+                "failure-timeout": "20s"
+            },
             "dependencies": {
                 "predecessors" : ["s3auth", "mero-ios-c1"],
                 "colocation" : [],
@@ -238,6 +271,9 @@
                 "service": "s3server",
                 "interval": "10s",
                 "timeouts": [ "10s", "10s", "10s" ]
+            },
+            "metadata": {
+                "failure-timeout": "20s"
             },
             "dependencies": {
                 "predecessors" : ["s3auth", "mero-ios-c2"],
@@ -260,6 +296,9 @@
                 "interval": "10s",
                 "timeouts": [ "10s", "10s", "10s" ]
             },
+            "metadata": {
+                "failure-timeout": "20s"
+            },
             "dependencies": {
                 "predecessors" : ["s3auth", "mero-ios-c2"],
                 "colocation" : [],
@@ -280,6 +319,9 @@
                 "service": "s3server",
                 "interval": "10s",
                 "timeouts": [ "10s", "10s", "10s" ]
+            },
+            "metadata": {
+                "failure-timeout": "20s"
             },
             "dependencies": {
                 "predecessors" : ["s3auth", "mero-ios-c2"],
@@ -302,6 +344,9 @@
                 "interval": "10s",
                 "timeouts": [ "10s", "10s", "10s" ]
             },
+            "metadata": {
+                "failure-timeout": "20s"
+            },
             "dependencies": {
                 "predecessors" : ["s3auth", "mero-ios-c2"],
                 "colocation" : [],
@@ -322,6 +367,9 @@
                 "service": "s3server",
                 "interval": "10s",
                 "timeouts": [ "10s", "10s", "10s" ]
+            },
+            "metadata": {
+                "failure-timeout": "20s"
             },
             "dependencies": {
                 "predecessors" : ["s3auth", "mero-ios-c2"],
@@ -344,6 +392,9 @@
                 "interval": "10s",
                 "timeouts": [ "10s", "10s", "10s" ]
             },
+            "metadata": {
+                "failure-timeout": "20s"
+            },
             "dependencies": {
                 "predecessors" : ["s3auth", "mero-ios-c2"],
                 "colocation" : [],
@@ -364,6 +415,9 @@
                 "service": "s3server",
                 "interval": "10s",
                 "timeouts": [ "10s", "10s", "10s" ]
+            },
+            "metadata": {
+                "failure-timeout": "20s"
             },
             "dependencies": {
                 "predecessors" : ["s3auth", "mero-ios-c2"],
@@ -386,6 +440,9 @@
                 "interval": "10s",
                 "timeouts": [ "10s", "10s", "10s" ]
             },
+            "metadata": {
+                "failure-timeout": "20s"
+            },
             "dependencies": {
                 "predecessors" : ["s3auth", "mero-ios-c2"],
                 "colocation" : [],
@@ -406,6 +463,9 @@
                 "service": "s3server",
                 "interval": "10s",
                 "timeouts": [ "10s", "10s", "10s" ]
+            },
+            "metadata": {
+                "failure-timeout": "20s"
             },
             "dependencies": {
                 "predecessors" : ["s3auth", "mero-ios-c2"],
@@ -428,6 +488,9 @@
                 "interval": "10s",
                 "timeouts": [ "10s", "10s", "10s" ]
             },
+            "metadata": {
+                "failure-timeout": "20s"
+            },
             "dependencies": {
                 "predecessors" : ["s3auth", "mero-ios-c2"],
                 "colocation" : [],
@@ -448,6 +511,9 @@
                 "service": "s3server",
                 "interval": "10s",
                 "timeouts": [ "10s", "10s", "10s" ]
+            },
+            "metadata": {
+                "failure-timeout": "20s"
             },
             "dependencies": {
                 "predecessors" : ["s3auth", "mero-ios-c2"],
