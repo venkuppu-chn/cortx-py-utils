@@ -1,0 +1,53 @@
+#!/bin/bash
+set -eu -o pipefail
+export PS4='+ [${BASH_SOURCE[0]##*/}:${LINENO}${FUNCNAME[0]:+:${FUNCNAME[0]}}] '
+# set -x
+
+PROG=${0##*/}
+
+usage() {
+    cat <<EOF
+Usage: $PROG [OPTS] [<params.yaml>]
+
+Configures CSM HA by preparing the configuration files and
+adding resources into the Pacemaker.
+
+Caveats:
+
+* The script expects Pacemaker to be started and have no resources configured.
+  Check with 'pcs status'.
+
+* Passwordless SSH access between the nodes is required.
+
+* The script should be executed from the "left" node.
+
+* Ensure that the provided roaming IP address belongs to
+  the management network interface and local subnetwork, which
+  are not used.
+
+* Consul should be started on all cluster nodes.
+
+* Elastic search should be started on all cluster nodes.
+
+Mandatory parameters:
+  --vip <addr>          CSM roaming IP address
+  -i, --interface <if>  Management network interface (default: eth1)
+  --left-node     <n1>  Left node hostname (default: pod-c1)
+  --right-node    <n2>  Right node hostname (default: pod-c2)
+
+Note: parameters can be specified either directly via command line options
+or via YAML file, e.g.:
+
+  vip: <vip>
+  interface: <iface>
+  left-node: <lnode>
+  right-node: <rnode>
+EOF
+}
+
+lnode=$(echo $(pcs status | grep Online | awk '{print $3}'))
+rnode=$(echo $(pcs status | grep Online | awk '{print $4}'))
+
+echo 'Adding csm resources...'
+HA_SCRIPT_PATH=/var/lib/eos/ha/script
+sudo bash ${HA_SCRIPT_PATH}/csm.sh

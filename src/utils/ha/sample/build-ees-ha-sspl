@@ -1,0 +1,60 @@
+#!/bin/bash
+set -eu -o pipefail
+export PS4='+ [${BASH_SOURCE[0]##*/}:${LINENO}${FUNCNAME[0]:+:${FUNCNAME[0]}}] '
+# set -x
+
+PROG=${0##*/}
+
+usage() {
+    cat <<EOF
+Usage: $PROG [OPTS] [<params.yaml>]
+
+Configures SSPL HA by preparing and adding resources into the Pacemaker.
+
+Caveats:
+
+* The script expects Pacemaker to be started and have consul and rabbitmq configured.
+  Check with 'pcs status'.
+
+* Passwordless SSH access between the nodes is required.
+
+* The script should be executed from the "left" node.
+
+* Consul should be started on all cluster nodes.
+
+* Rabbitmq should be started on all cluster nodes.
+
+
+Mandatory parameters:
+  --left-node     <n1>  Left node hostname (default: pod-c1)
+  --right-node    <n2>  Right node hostname (default: pod-c2)
+
+Note: parameters can be specified either directly via command line options
+or via YAML file, e.g.:
+  left-node: <lnode>
+  right-node: <rnode>
+EOF
+}
+
+lnode=$(echo $(pcs status | grep Online | awk '{print $3}'))
+rnode=$(echo $(pcs status | grep Online | awk '{print $4}'))
+
+die() {
+    echo "$PROG: ERROR: $*" >&2
+    exit 1
+}
+
+echo "Copy sspl resource agent"
+SSPL_SOURCE_AGENT=/opt/seagate/eos/sspl/bin/pacemaker/sspl_stateful_resource_agent
+SSPL_AGENT=/usr/lib/ocf/resource.d/sspl/sspl_stateful_resource_agent
+if [ ! -f "$SSPL_SOURCE_AGENT" ]; then
+    echo "SSPL Resource agent missing $SSPL_SOURCE_AGENT" | die
+fi
+
+if [ ! -f "$SSPL_AGENT" ]; then
+    cp $SSPL_SOURCE_AGENT $SSPL_AGENT
+fi
+
+echo 'Adding sspl resource and constraints...'
+HA_SCRIPT_PATH=/var/lib/eos/ha/script
+sudo bash ${HA_SCRIPT_PATH}/sspl.sh

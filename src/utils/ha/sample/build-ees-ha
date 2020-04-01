@@ -1,0 +1,411 @@
+#!/usr/bin/env bash
+set -eu -o pipefail
+export PS4='+ [${BASH_SOURCE[0]##*/}:${LINENO}${FUNCNAME[0]:+:${FUNCNAME[0]}}] '
+# set -x
+
+PROG=${0##*/}
+
+usage() {
+    cat <<EOF
+
+Usage: $PROG [OPTS] <CDF> [<params.yaml>]
+
+Configures EES-HA by preparing the configuration files and
+adding resources into the Pacemaker.
+
+Here are some prerequisites/guidelines:
+
+* Pacemaker should be started & configured with a
+  clean (without resources) cluser. Check with 'pcs status'.
+
+* Password-less ssh access between the nodes is required.
+
+* The script should be run from the "left" node.
+
+* Make sure the provided roaming IP addresses belong to
+  the local sub-network and are not used by anyone else.
+
+Mandatory parameters:
+  --ip1 <addr>         1st roaming IP address
+  --ip2 <addr>         2nd roaming IP address.
+        <CDF>          Hare Cluster Description File
+
+Optional parameters:
+  -i, --interface <if>  Data network interface (default: eth1)
+  --left-node     <n1>  Left  node hostname (default: pod-c1)
+  --right-node    <n2>  Right node hostname (default: pod-c2)
+  --left-volume   <lv>  Left  node /var/mero volume (default: /dev/sdb)
+  --right-volume  <rv>  Right node /var/mero volume (default: /dev/sdc)
+  --skip-mkfs           Don't mkfs /var/mero
+  --net-type <tcp|o2ib> LNet network type (default: tcp)
+
+Note: parameters can be specified either directly via cmd-line options
+or via a yaml file, e.g.:
+
+  ip1: <ip>
+  ip2: <ip2>
+  interface: <iface>
+  left-node: <lnode>
+  right-node: <rnode>
+  left-volume: <lvolume>
+  right-volume: <rvolume>
+  skip-mkfs: true
+  net-type: <tcp|o2ib>
+
+EOF
+}
+
+TEMP=$(getopt --options h,i: \
+              --longoptions help,ip1:,ip2:,interface:,left-node:,right-node: \
+              --longoptions left-volume:,right-volume:,skip-mkfs,net-type: \
+              --name "$PROG" -- "$@" || true)
+
+(($? == 0)) || { usage >&2; exit 1; }
+
+eval set -- "$TEMP"
+
+ip1=
+ip2=
+iface=eth1
+lnode=pod-c1
+rnode=pod-c2
+lvolume=/dev/sdb
+rvolume=/dev/sdc
+skip_mkfs=false
+net_type=tcp
+
+while true; do
+    case "$1" in
+        -h|--help)           usage; exit ;;
+        --ip1)               ip1=$2; shift 2 ;;
+        --ip2)               ip2=$2; shift 2 ;;
+        -i|--interface)      iface=$2; shift 2 ;;
+        --left-node)         lnode=$2; shift 2 ;;
+        --right-node)        rnode=$2; shift 2 ;;
+        --left-volume)       lvolume=$2; shift 2 ;;
+        --right-volume)      rvolume=$2; shift 2 ;;
+        --skip-mkfs)         skip_mkfs=true; shift 1 ;;
+        --net-type)          net_type=$2; shift 2 ;;
+        --)                  shift; break ;;
+        *)                   break ;;
+    esac
+done
+
+cdf=${1:-}
+argsfile=${2:-}
+
+hare_dir=/var/lib/hare
+
+if [[ -f $argsfile ]]; then
+    while IFS=': ' read name value; do
+       case $name in
+           ip1)          ip1=$value     ;;
+           ip2)          ip2=$value     ;;
+           interface)    iface=$value   ;;
+           left-node)    lnode=$value   ;;
+           right-node)   rnode=$value   ;;
+           left-volume)  lvolume=$value ;;
+           right-volume) rvolume=$value ;;
+           skip-mkfs)    skip_mkfs=true ;;
+           net-type)     net_type=$value ;;
+           '')           ;;
+           *) echo "Invalid parameter '$name' in $argsfile" >&2
+              usage >&2; exit 1 ;;
+       esac
+    done < $argsfile
+fi
+
+[[ $ip1 ]] && [[ $ip2 ]] && [[ $cdf ]]  || {
+    usage >&2
+    exit 1
+}
+
+die() {
+    echo "$PROG: ERROR: $*" >&2
+    exit 1
+}
+
+[[ -b $lvolume ]] || die "meta-data volume $lvolume is not available"
+[[ -b $rvolume ]] || die "meta-data volume $rvolume is not available"
+
+HA_SCRIPT_PATH=/var/lib/eos/ha/script
+
+run_on_both() {
+    local cmd=$*
+    eval $cmd
+    ssh $rnode $cmd
+}
+
+cmd='
+sudo mkdir -p /usr/lib/ocf/resource.d/seagate &&
+sudo ln -sf /opt/seagate/eos/hare/pacemaker/lnet
+           /usr/lib/ocf/resource.d/seagate/lnet
+'
+run_on_both $cmd
+
+echo 'Adding roming IP and lnet'
+sudo bash ${HA_SCRIPT_PATH}/lnet_c1_c2.sh $iface:c1 $net_type $iface:c2 $net_type
+
+sleep 5 # Allow Pacemaker to configure the IPs
+
+# Check the IPs
+check_msg="
+Check the following:
+ 1) Make sure the netmask of the main IP on $iface interface is <= 24 bits.
+ 2) Run 'pcs status' and make sure LNet is configured.
+ 3) STONITH is configured or disabled in Pacemaker."
+
+ip a | grep -q $ip1 ||
+  die "the IP address ($ip1) on the $lnode failed to be configured. $check_msg"
+
+ssh $rnode "ip a | grep -q $ip2" ||
+  die "the IP address ($ip2) on the $rnode failed to be configured. $check_msg"
+
+echo 'Preparing Hare configuration files...'
+
+mkfs_ext4() {
+    local dev=$1
+    sudo mkfs.ext4 -q $dev &>/dev/null < <(echo y)
+}
+
+if ! [[ $skip_mkfs ]]; then
+    mkfs_ext4 $lvolume
+    mkfs_ext4 $rvolume
+fi
+
+# Mount /var/mero (if not mounted).
+mkdir -p /var/mero &&
+  ! mountpoint -q /var/mero && sudo mount $lvolume /var/mero || true
+ssh $rnode "mkdir -p /var/mero &&
+  ! mountpoint -q /var/mero && sudo mount $rvolume /var/mero || true"
+
+# Update data_iface values in CDF: 1st data_iface will be `${iface}_c1`,
+#                                  2nd data_iface will be `${iface}_c2`.
+sudo sed -E -e "/[#].*data_iface/b ; # skip commented out data_iface lines
+                /data_iface: *[a-z0-9]+[_:]c[12]/b ; # skip already updated
+                0,/(data_iface: *)[a-z0-9]+\b/s//\1${iface}_c1/ ;
+                0,/(data_iface: *)[a-z0-9]+\b/s//\1${iface}_c2/" \
+            -i $cdf
+
+if facter --version | grep -q ^3; then
+    # New facter-3 requires colons (:) for interface aliases.
+    sudo sed -E -e "/[#].*data_iface/b ; # skip commented out data_iface lines
+                    s/(data_iface: *${iface})_(c[12])/\1:\2/" \
+            -i $cdf
+fi
+
+# Make sure mero-kernel is not loaded.
+run_on_both 'sudo systemctl stop mero-kernel'
+
+hctl bootstrap --mkfs $cdf
+hctl shutdown
+
+# LNet endpoints suffixes should be unique so that in case
+# of a failover all the Mero services (which would work on
+# the same node) could talk to each other.
+# (It is a workaround for Mero EOS-2799 issue.)
+for f in $hare_dir/{confd.xc,consul-kv.json}; do
+    sed -r -e "s/($ip2.*:12345:1):1/\1:2/" \
+           -e "s/($ip2.*:12345:2):1/\1:3/" \
+           -e "s/($ip2.*:12345:2):2/\1:4/" \
+        -i $f
+done
+
+hctl bootstrap -c $hare_dir/
+hctl shutdown
+
+# Prepare symlinks for the failover so that m0d processes
+# from both nodes could access their files at `/var/mero`:
+sudo mkdir -p /var/mero1
+sudo mkdir -p /var/mero2
+sudo mount $lvolume /var/mero1
+sudo mount $rvolume /var/mero2
+sudo ln -sf $(find /var/mero2/m0d-* -maxdepth 0 -type d) \
+           /var/mero1/ || true
+sudo ln -sf $(find /var/mero1/m0d-* -maxdepth 0 -type d) \
+           /var/mero2/ || true
+sudo umount /var/mero2
+sudo umount /var/mero1
+sudo rm -r /var/mero1
+
+# We don't need `/var/mero` mounted anymore. `hax` systemd
+# unit will mount/umount it automatically on start/stop.
+sudo umount /var/mero
+
+ssh $rnode 'sudo mkdir -p /var/mero1 && sudo umount /var/mero'
+
+echo 'Preparing Consul agents config files...'
+cmd='
+sudo cp /usr/lib/systemd/system/hare-consul-agent.service
+        /usr/lib/systemd/system/hare-consul-agent-c1.service &&
+sudo cp /usr/lib/systemd/system/hare-consul-agent.service
+        /usr/lib/systemd/system/hare-consul-agent-c2.service &&
+for i in c{1,2}; do
+    sudo sed "s/consul-env/&-$i/"
+             -i /usr/lib/systemd/system/hare-consul-agent-$i.service &&
+    sudo sed "/ExecStart=/aExecStartPost=/bin/sleep 5"
+             -i /usr/lib/systemd/system/hare-consul-agent-$i.service;
+done'
+run_on_both $cmd
+
+cmd_deregister_node() {
+    local node=$1
+    echo "/usr/bin/curl -i -X PUT -d '{\\\"Node\\\":\\\"$node\\\"}' 'http://localhost:8500/v1/catalog/deregister'"
+}
+
+consul_c2_cfg_dir=$hare_dir/consul-$ip2
+consul_c1_cfg_dir=$hare_dir/consul-$ip1
+
+sudo sed \
+ -e "/ExecStart=/iExecStartPre=/bin/rm -rf $consul_c2_cfg_dir" \
+ -e "/ExecStart=/iExecStartPre=-/opt/seagate/eos/hare/bin/consul force-leave $rnode" \
+ -e "/ExecStartPost=/aExecStartPost=$(cmd_deregister_node $rnode)" \
+ -i /usr/lib/systemd/system/hare-consul-agent-c2.service
+sudo systemctl daemon-reload
+
+cmd="
+sudo sed
+ -e '/ExecStart=/iExecStartPre=/bin/rm -rf $consul_c1_cfg_dir'
+ -e '/ExecStart=/iExecStartPre=-/opt/seagate/eos/hare/bin/consul force-leave $lnode'
+ -e \"/ExecStartPost=/aExecStartPost=$(cmd_deregister_node $lnode)\"
+ -i /usr/lib/systemd/system/hare-consul-agent-c1.service &&
+sudo systemctl daemon-reload"
+ssh $rnode $cmd
+
+sudo cp $hare_dir/consul-env $hare_dir/consul-env-c1
+scp $rnode:$hare_dir/consul-env $hare_dir/consul-env-c2
+sudo sed -r \
+  -e 's/server$/server-c1/' \
+  -e "s/JOIN=/&-retry-join $ip2 /" \
+  -i $hare_dir/consul-env-c1
+sudo sed -r \
+  -e 's/server$/server-c2/' \
+  -e 's/127.0.0.1 //' \
+  -i $hare_dir/consul-env-c2
+
+scp $hare_dir/consul-env $rnode:$hare_dir/consul-env-c1
+cmd="
+sudo cp $hare_dir/consul-env $hare_dir/consul-env-c2 &&
+sudo sed -r \
+  -e 's/server$/server-c1/' \
+  -e 's/127.0.0.1 //' \
+  -e 's/JOIN=/&-retry-join $ip2 /' \
+  -e 's/ -bootstrap-expect 1//' \
+  -i $hare_dir/consul-env-c1 &&
+sudo sed -r \
+  -e 's/server$/server-c2/' \
+  -i $hare_dir/consul-env-c2"
+ssh $rnode $cmd
+
+sudo cp $hare_dir/consul-server-conf.json \
+        $hare_dir/consul-server-c1-conf.json
+sudo sed -e 's/"--hax"/"--svc", "hare-hax-c1"/' \
+         -i $hare_dir/consul-server-c1-conf.json
+cp $hare_dir/consul-server-c1-conf.json \
+   /tmp/consul-server-c1-conf.json
+sudo sed -e "/\"server\"/a\ \ \"node_name\": \"$lnode\"," \
+         -e '/\"server\"/a\ \ "leave_on_terminate": true,' \
+         -i /tmp/consul-server-c1-conf.json
+scp /tmp/consul-server-c1-conf.json $rnode:$hare_dir/
+
+cmd="
+sudo cp $hare_dir/consul-server-conf.json \
+        $hare_dir/consul-server-c2-conf.json &&
+sudo sed -e 's/\"--hax\"/\"--svc\", \"hare-hax-c2\"/' \
+         -i $hare_dir/consul-server-c2-conf.json &&
+cp $hare_dir/consul-server-c2-conf.json \
+   /tmp/consul-server-c2-conf.json &&
+sudo sed -e '/\"server\"/a\ \ \"node_name\": \"$rnode\",' \
+         -e '/\"server\"/a\ \ \"leave_on_terminate\": true,' \
+         -i /tmp/consul-server-c2-conf.json"
+ssh $rnode $cmd
+scp $rnode:/tmp/consul-server-c2-conf.json $hare_dir/
+
+echo 'Adding Hax to Pacemaker...'
+
+sudo cp /usr/lib/systemd/system/hare-hax.service \
+        /usr/lib/systemd/system/hare-hax-c1.service
+sudo cp /usr/lib/systemd/system/hare-hax.service \
+        /usr/lib/systemd/system/hare-hax-c2.service
+sudo sed -e 's/hare-consul-agent.service/hare-consul-agent-c1.service/' \
+         -e "/ExecStart=/iExecStartPre=/bin/mount $lvolume /var/mero" \
+         -e '/ExecStart=/aExecStopPost=/bin/umount --lazy /var/mero' \
+         -i /usr/lib/systemd/system/hare-hax-c1.service
+sudo sed -e 's/hare-consul-agent.service/hare-consul-agent-c2.service/' \
+         -e "/ExecStart/iEnvironmentFile=$hare_dir/hax-env-c2" \
+         -e "/ExecStart=/iExecStartPre=/bin/mount $rvolume /var/mero2" \
+         -e '/ExecStart=/aExecStopPost=/bin/umount --lazy /var/mero2' \
+         -i /usr/lib/systemd/system/hare-hax-c2.service
+echo "HARE_HAX_NODE_NAME=$rnode" | sudo tee $hare_dir/hax-env-c2 > /dev/null
+
+cmd="
+sudo cp /usr/lib/systemd/system/hare-hax.service
+        /usr/lib/systemd/system/hare-hax-c1.service &&
+sudo sed -e 's/hare-consul-agent.service/hare-consul-agent-c1.service/'
+         -e '/ExecStart/iEnvironmentFile=$hare_dir/hax-env-c1'
+         -e '/ExecStart=/iExecStartPre=/bin/mount $lvolume /var/mero1'
+         -e '/ExecStart=/aExecStopPost=/bin/umount --lazy /var/mero1'
+         -i /usr/lib/systemd/system/hare-hax-c1.service &&
+sudo cp /usr/lib/systemd/system/hare-hax.service
+        /usr/lib/systemd/system/hare-hax-c2.service &&
+sudo sed -e 's/hare-consul-agent.service/hare-consul-agent-c2.service/'
+         -e '/ExecStart=/iExecStartPre=/bin/mount $rvolume /var/mero'
+         -e '/ExecStart=/aExecStopPost=/bin/umount --lazy /var/mero'
+         -i /usr/lib/systemd/system/hare-hax-c2.service &&
+echo 'HARE_HAX_NODE_NAME=$lnode' | sudo tee $hare_dir/hax-env-c1 > /dev/null"
+ssh $rnode $cmd
+
+echo 'Adding consul mero-kernel hax to Pacemaker...'
+sudo bash ${HA_SCRIPT_PATH}/hax_c1_c2.sh $iface:c1 $net_type $iface:c2 $net_type
+
+cmd='sudo sed "s/TimeoutStopSec=.*/TimeoutStopSec=5sec/"
+              -i /usr/lib/systemd/system/m0d@.service &&
+     sudo systemctl daemon-reload'
+run_on_both $cmd
+
+get_fid() {
+    local cfg=$1
+    local svc=$2
+    jq -r '.services[] | "\(.name) \(.checks[].args[])"' $cfg |
+        awk "/$svc.0x/ {print \$2}"
+}
+
+confd_c1_fid=$(get_fid $hare_dir/consul-server-c1-conf.json confd)
+confd_c2_fid=$(get_fid $hare_dir/consul-server-c2-conf.json confd)
+ios_c1_fid=$(get_fid $hare_dir/consul-server-c1-conf.json ios)
+ios_c2_fid=$(get_fid $hare_dir/consul-server-c2-conf.json ios)
+
+echo 'Adding Mero to Pacemaker...'
+sudo bash ${HA_SCRIPT_PATH}/mero_iso_c1_c2.sh $iface:c1 $net_type $iface:c2 $net_type
+
+# Copy only the updated files from each side.
+sudo rsync -u /etc/sysconfig/m0d-* $rnode:/etc/sysconfig/
+sudo rsync -u "$rnode:/etc/sysconfig/m0d-*" /etc/sysconfig/
+
+######################### s3server ############################
+
+echo 'Adding ldap and s3auth to Pacemaker...'
+sudo bash ${HA_SCRIPT_PATH}/s3auth.sh
+
+echo 'Adding elasticsearch statsd haproxy to Pacemaker..'
+sudo bash ${HA_SCRIPT_PATH}/el_ha_st.sh
+
+echo 'Adding S3server to Pacemaker...'
+get_s3_svc() {
+    local cfg=$1
+    local svc=$2
+    jq -r '.services[] | "\(.name) \(.checks[].args[])"' $cfg |
+        awk "/$svc.s3server@/ {print \$2}"
+}
+
+cmd='sudo sed "s/TimeoutStopSec=.*/TimeoutStopSec=5sec/"
+              -i /usr/lib/systemd/system/s3server@.service &&
+     sudo systemctl daemon-reload'
+run_on_both $cmd
+
+echo 'Add s3server to Pacemaker'
+sudo bash ${HA_SCRIPT_PATH}/s3server.sh
+
+echo 'Adding rabbitmq and s3 producer consumer to pacemaker'
+sudo bash ${HA_SCRIPT_PATH}/s3back.sh
+
