@@ -16,54 +16,23 @@
  prohibited. All other rights are expressly reserved by Seagate Technology, LLC.
  ****************************************************************************
 """
+from eos.utils.ha.hac import const
+from eos.utils.ha.dm.repository.node_status import NodeStatusDB
+from eos.utils.ha.dm.dm.node_status import NodeStatusModel
 
 class DecisionMonitor:
     def __init__(self):
         self._local_node = None
-        self._functional_path_list = {
-            "io": self.is_io_path_functional,
-            "mgmt": self.is_mgnt_path_functional
-        }
-        self._recovered_path_list = {
-            "io": self.is_io_path_recovered,
-            "mgmt": self.is_mgnt_path_recovered
-        }
-    
-    def is_io_path_functional(self, entity, entity_id):
-        """
-        Check io path for functionality. 
-        If consul have no data return true.
-        """
-        pass
-    
-    def is_io_path_recovered(self, entity, entity_id):
-        """
-        Check io path recovery for given entity.
-        If consul have value for key is resolved then return true.
-        """
-        pass
-    
-    def is_mgnt_path_functional(self, entity, entity_id):
-        """
-        Check management path for functionality. 
-        If consul have no data return true.
-        """
-        pass
-    
-    def is_mgnt_path_recovered(self, entity, entity_id):
-        """
-        Check management path recovery for given entity.
-        If consul have value for key is resolved then return true.
-        """
-        pass
-    
-    def acknowledge_events(self, entity, entity_id, node_id, component, component_id):
+        self._node_status = NodeStatusDB()
+
+    def acknowledge_events(self, entity, entity_id, node_id, component,
+                           component_id):
         """
         Acknowledge all event for related path.
         """
         pass
-    
-    def get_status(self, entity, entity_id, node_id, path):
+
+    def get_status(self, node_id, path, **kwargs):
         """
         Get status for io and management path.
         Check entity for local node:
@@ -72,7 +41,13 @@ class DecisionMonitor:
         Functional status:
         Recovery status:
         """
-        if self._local_node == node_id:
-            return self._functional_path_list[path]()
-        else:
-            return self._recovered_path_list[path]()
+        data = self._node_status.get(node_id)
+        if not data or isinstance(data[0], NodeStatusModel):
+            return True
+        if path == const.io:
+            if data[0].io_failure_count == 0:
+                return True
+        elif path == const.mgmt:
+            if data[0].mgmt_failure_count == 0:
+                return True
+        return False
