@@ -57,9 +57,9 @@ class DecisionMonitor:
         """
         pass
     
-    def delete_events(self, entity, entity_id, node_id, component, component_id):
+    def acknowledge_events(self, entity, entity_id, node_id, component, component_id):
         """
-        Delete all event for related path.
+        Acknowledge all event for related path.
         """
         pass
     
