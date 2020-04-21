@@ -17,13 +17,46 @@
  ****************************************************************************
 """
 from eos.utils.ha.hac import const
+from eos.utils.schema.payload import Json
 from eos.utils.ha.dm.repository.node_status import NodeStatusDB
 from eos.utils.ha.dm.dm.node_status import NodeStatusModel
 
 class DecisionMonitor:
     def __init__(self):
-        self._local_node = None
+        self._mapping = Json(const.DECISION_MAPPING_FILE).load()
+        self._local_node = self._mapping.get('local')
         self._node_status = NodeStatusDB()
+
+    def check_path_functional(self, node_id, path):
+        """
+        Checks whether the path is Functional or Not
+        :param node_id: Node_id for which Path count needs to be tested :type:Str
+        :param path: Path io/mgmt for mgmt path to be checked.
+        :return: True if Count is 0/Data not Found else False
+        """
+        data = self._node_status.get(node_id)
+        if not data or isinstance(data[0], NodeStatusModel):
+            return False
+        if path == const.IO_PATH:
+            if data[0].io_failure_count != 0:
+                return True
+        elif path == const.MGMT_PATH:
+            if data[0].mgmt_failure_count != 0:
+                return True
+        return False
+
+    def check_path_recovered(self, node_id):
+        """
+        Check if the Both the Paths are Recovered.
+        :param node_id: Node ID for Path.
+        :return:
+        """
+        data = self._node_status.get(node_id)
+        if not data or isinstance(data[0], NodeStatusModel):
+            return False
+        if data[0].io_failure_count == 0 and data[0].mgmt_failure_count == 0:
+                return True
+        return False
 
     def acknowledge_events(self, entity, entity_id, node_id, component,
                            component_id):
@@ -41,13 +74,7 @@ class DecisionMonitor:
         Functional status:
         Recovery status:
         """
-        data = self._node_status.get(node_id)
-        if not data or isinstance(data[0], NodeStatusModel):
-            return True
-        if path == const.io:
-            if data[0].io_failure_count == 0:
-                return True
-        elif path == const.mgmt:
-            if data[0].mgmt_failure_count == 0:
-                return True
-        return False
+        if self._local_node == node_id:
+            return self.check_path_functional(node_id, path)
+        else:
+            return self.check_path_recovered(node_id)
