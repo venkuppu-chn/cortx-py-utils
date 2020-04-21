@@ -84,4 +84,4 @@ class DecisionMonitor:
         if self._local_node == node_id:
             return self.check_path_functional(node_id, path)
         else:
-            return self.check_path_recovered(node_id)
+            return not self.check_path_recovered(node_id)
