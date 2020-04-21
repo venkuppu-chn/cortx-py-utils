@@ -18,15 +18,15 @@
 """
 
 class DecisionMonitor:
-    def __init__():
-        self.local_node = None
-        self.functional_path_list = {
+    def __init__(self):
+        self._local_node = None
+        self._functional_path_list = {
             "io": self.is_io_path_functional,
-            "mgnt": self.is_mgnt_path_functional
+            "mgmt": self.is_mgnt_path_functional
         }
-        self.recovered_path_list = {
+        self._recovered_path_list = {
             "io": self.is_io_path_recovered,
-            "mgnt": self.is_mgnt_path_recovered
+            "mgmt": self.is_mgnt_path_recovered
         }
     
     def is_io_path_functional(self, entity, entity_id):
@@ -72,8 +72,7 @@ class DecisionMonitor:
         Functional status:
         Recovery status:
         """
-        if local_node == node_id:
-            return true if self.functional_path_list[path](entity, entity_id) else false
+        if self._local_node == node_id:
+            return self._functional_path_list[path]()
         else:
-            return true if self.recovered_path_list[path](entity, entity_id) else false
-
+            return self._recovered_path_list[path]()
