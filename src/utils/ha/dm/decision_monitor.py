@@ -16,16 +16,20 @@
  prohibited. All other rights are expressly reserved by Seagate Technology, LLC.
  ****************************************************************************
 """
+import asyncio
 from eos.utils.ha.hac import const
 from eos.utils.schema.payload import Json
 from eos.utils.ha.dm.repository.node_status import NodeStatusDB
-from eos.utils.ha.dm.dm.node_status import NodeStatusModel
+from eos.utils.ha.dm.models.node_status import NodeStatusModel
+from eos.utils.ha.dm.models.decisiondb import DecisionDB
 
 class DecisionMonitor:
     def __init__(self):
         self._mapping = Json(const.DECISION_MAPPING_FILE).load()
         self._local_node = self._mapping.get('local')
         self._node_status = NodeStatusDB()
+        self._decisiondb = DecisionDB()
+        self._loop = asyncio.get_event_loop()
 
     def check_path_functional(self, node_id, path):
         """
@@ -55,15 +59,18 @@ class DecisionMonitor:
         if not data or isinstance(data[0], NodeStatusModel):
             return False
         if data[0].io_failure_count == 0 and data[0].mgmt_failure_count == 0:
-                return True
+            self.acknowledge_events(node_id)
+            return True
         return False
 
-    def acknowledge_events(self, entity, entity_id, node_id, component,
-                           component_id):
+    def acknowledge_events(self, node_id, **kwargs):
         """
         Acknowledge all event for related path.
         """
-        pass
+        keys = self._mapping.get(node_id)
+        for each_key in keys:
+            args = tuple(each_key.split("/"))
+            self._loop.run_until_complete(self._decisiondb.delete_event(*args))
 
     def get_status(self, node_id, path, **kwargs):
         """
