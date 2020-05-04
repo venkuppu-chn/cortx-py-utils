@@ -35,7 +35,7 @@ class Log:
     logger = None
 
     @staticmethod
-    def init(service_name, log_path, level="INFO", backup_count=10, file_size_in_mb=10, 
+    def init(service_name, log_path="/tmp", level="INFO", backup_count=10, file_size_in_mb=10, 
             syslog_server=None, syslog_port=None):
         """ Initialize logging to log to syslog """
         try:
