@@ -63,7 +63,9 @@ class esCleanup(object):
             if not os.path.exists(path): os.makedirs(path)
         except OSError as err:
             if err.errno != errno.EEXIST: raise
-        logger = logging.getLogger()
+        # added hardcoded logger "util_log" to avoid duplicate log
+        # in csm_cleanup.log
+        logger = logging.getLogger("util_log")
         logger.setLevel(logging.INFO)
         format = '%(name)s %(levelname)s %(message)s'
         formatter = logging.Formatter(format)
@@ -71,3 +73,13 @@ class esCleanup(object):
         fh.setFormatter(formatter)
         logger.addHandler(fh)
         return logger
+
+    # Remove selected index from es db
+    def remove_by_index(self, host, index):
+        response = requests.delete(f'http://{host}/{index}')
+        if response.status_code == 200:
+            self.logger.debug(f'index {index} removed successfully')
+        else:
+            self.logger.error(f'error removing index {index} :{response.status_code}')
+        return response.status_code
+
