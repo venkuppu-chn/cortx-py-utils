@@ -30,8 +30,18 @@ class DecisionDB:
     """
 
     def __init__(self) -> None:
-        conf = GeneralConfig(database.DATABASE)
-        self.storage = DataBaseProvider(conf)
+        self.storage = DecisionDB.get_storage_instance()
+
+    @classmethod
+    def get_storage_instance(cls):
+        """
+        Fetches the Existing Instance for Storage Class.
+        :return:
+        """
+        if not  hasattr(cls, "storage"):
+            conf = GeneralConfig(database.DATABASE)
+            return DataBaseProvider(conf)
+        return cls.storage
 
     async def store_event(self, entity, entity_id, component, component_id,
                           alert_time, action):
