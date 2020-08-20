@@ -25,7 +25,8 @@ import os
 import asyncio
 
 from eos.utils.log import Log
-from eos.utils.schema.payload import JsonMessage, Json
+from eos.utils.schema.conf import Conf
+from eos.utils.schema.payload import JsonMessage, Json, Yaml
 from eos.utils import const
 from eos.utils.ha.dm.repository.decisiondb import DecisionDB
 
@@ -112,11 +113,40 @@ class DecisionMaker(object):
     """
 
     def __init__(self, decisiondb=DecisionDB()):
-        self._rule_engine = RuleEngine(os.path.join(\
-            const.CORTX_HA_INSTALL_PATH, const.RULES_FILE_PATH))
-        self._decision_db = decisiondb
-        self._conf = Json(os.path.join(\
-            const.CORTX_HA_INSTALL_PATH, const.CONF_FILE_PATH)).load()
+        """
+        Initialize decision maker
+        In vm env disable decision maker.
+        """
+        self._decision_maker_enabled = True
+        self._set_enable_flag()
+        if self._decision_maker_enabled:
+            self._rule_engine = RuleEngine(os.path.join(\
+                const.CORTX_HA_INSTALL_PATH, const.RULES_FILE_PATH))
+            self._decision_db = decisiondb
+            self._conf = Json(os.path.join(\
+                const.CORTX_HA_INSTALL_PATH, const.CONF_FILE_PATH)).load()
+
+    def is_enabled(self):
+        """
+        Check if decision maker is enabled
+        """
+        Log.debug(f"Decision maker env enable check is {self._decision_maker_enabled}")
+        return self._decision_maker_enabled
+
+    def _set_enable_flag(self, force_set=False):
+        """
+        Set decision maker flag to create ha action.
+        """
+        ha_conf = os.path.join(const.CORTX_HA_INSTALL_PATH, const.HA_CONFIG_FILE)
+        if force_set:
+            Log.debug(f"Decision maker env enable check is {force_set}")
+            self._decision_maker_enabled = True
+        elif os.path.exists(ha_conf):
+            Conf.load(const.HA_CONFIG_INDEX, Yaml(ha_conf))
+            env = Conf.get(const.HA_CONFIG_INDEX, const.HA_CONFIG_ENV)
+            self._decision_maker_enabled = False if env == const.VM_ENV else True
+        else:
+            self._decision_maker_enabled = False
 
     async def _get_data_nw_interface(self, host_id):
         interface = []
