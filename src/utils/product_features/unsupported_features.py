@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 # CORTX-Utils: CORTX Python common library.
 # Copyright (c) 2020 Seagate Technology LLC and/or its Affiliates
 # This program is free software: you can redistribute it and/or modify
@@ -15,14 +16,14 @@
 # please email opensource@seagate.com or cortx-questions@seagate.com.
 
 import os
-from eos.utils.data.access import Query
-from eos.utils.data.access.filters import Compare, And
-from eos.utils.data.db.db_provider import DataBaseProvider, GeneralConfig
-from eos.utils import const
-from eos.utils.log import Log
-from eos.utils.schema import database
-from eos.utils.schema.payload import Json
-from eos.utils.product_features.model import UnsupportedFeaturesModel
+from cortx.utils.data.access import Query
+from cortx.utils.data.access.filters import Compare, And
+from cortx.utils.data.db.db_provider import DataBaseProvider, GeneralConfig
+from cortx.utils import const
+from cortx.utils.log import Log
+from cortx.utils.schema import database
+from cortx.utils.schema.payload import Json
+from cortx.utils.product_features.model import UnsupportedFeaturesModel
 
 class UnsupportedFeaturesDB:
     def __init__(self) -> None:

@@ -1,21 +1,19 @@
 #!/usr/bin/env python3
 
-"""
- ****************************************************************************
- Filename:          storage.py
- _description:      Consul KV storage implementation
-
- Creation Date:     18/10/2019
- Author:            Dmitry Didenko
-
- Do NOT modify or remove this copyright and confidentiality notice!
- Copyright (c) 2001 - $Date: 2015/01/14 $ Seagate Technology, LLC.
- The code contained herein is CONFIDENTIAL to Seagate Technology, LLC.
- Portions are also trade secret. Any use, duplication, derivation, distribution
- or disclosure of this code, for any reason, not expressly authorized is
- prohibited. All other rights are expressly reserved by Seagate Technology, LLC.
- ****************************************************************************
-"""
+# CORTX-Py-Utils: CORTX Python common library.
+# Copyright (c) 2020 Seagate Technology LLC and/or its Affiliates
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU Affero General Public License for more details.
+# You should have received a copy of the GNU Affero General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
+# For any questions about this software or licensing,
+# please email opensource@seagate.com or cortx-questions@seagate.com.
 
 import asyncio
 import multiprocessing
@@ -31,16 +29,16 @@ from consul.aio import Consul
 from schematics.types import BaseType, StringType
 from schematics.exceptions import ConversionError
 
-from eos.utils.data.access import Query, SortOrder, IDataBase
-from eos.utils.data.access import ExtQuery
-from eos.utils.data.db import GenericDataBase, GenericQueryConverter
-from eos.utils.data.access import BaseModel
-from eos.utils.errors import DataAccessExternalError, DataAccessInternalError, \
+from cortx.utils.data.access import Query, SortOrder, IDataBase
+from cortx.utils.data.access import ExtQuery
+from cortx.utils.data.db import GenericDataBase, GenericQueryConverter
+from cortx.utils.data.access import BaseModel
+from cortx.utils.errors import DataAccessExternalError, DataAccessInternalError, \
     DataAccessError
-from eos.utils.data.access.filters import FilterOperationCompare
-from eos.utils.data.access.filters import ComparisonOperation, IFilter
+from cortx.utils.data.access.filters import FilterOperationCompare
+from cortx.utils.data.access.filters import ComparisonOperation, IFilter
 
-CONSUL_ROOT = "eos/base"
+CONSUL_ROOT = "cortx/base"
 OBJECT_DIR = "obj"
 PROPERTY_DIR = "prop"
 
@@ -216,7 +214,7 @@ class ConsulDB(GenericDataBase):
         if not isinstance(model, type) or not issubclass(model, BaseModel):
             raise DataAccessInternalError(
                 "Model parameter is not a Class object or not inherited "
-                "from eos.utils.data.access.BaseModel")
+                "from cortx.utils.data.access.BaseModel")
         self._model = model  # Needed to build returning objects
 
         # self._query_service = ConsulQueryService(self._collection, self._consul_client,
@@ -325,7 +323,7 @@ class ConsulDB(GenericDataBase):
 
     async def _get_all_raw(self) -> List[Dict]:
         obj_dir = self._templates.get_object_dir()
-        obj_dir = obj_dir.lower() + "/"  # exclude key eos/base/type/obj without trailing "/"
+        obj_dir = obj_dir.lower() + "/"  # exclude key cortx/base/type/obj without trailing "/"
         index, data = await self._consul_client.kv.get(obj_dir, recurse=True,
                                                        consistency=True)
         if data is None:

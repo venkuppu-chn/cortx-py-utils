@@ -15,7 +15,7 @@
 #
 {
     # Component:
-    # This is equivalent to EOS components, e.g. csm, sspl, etc.
+    # This is equivalent to CORTX components, e.g. csm, sspl, etc.
     "<component>": {
 
         # Resource:

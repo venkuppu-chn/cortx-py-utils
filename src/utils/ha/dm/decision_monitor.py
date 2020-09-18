@@ -1,35 +1,33 @@
 #!/usr/bin/env python3
 
-"""
- ****************************************************************************
- Filename:          decision_monitor.py
- Description:       Decision Monitor Class File.
-
- Creation Date:     23/04/2020
- Author:            Prathamesh Rodi
-
- Do NOT modify or remove this copyright and confidentiality notice!
- Copyright (c) 2001 - : 2015/01/14 $ Seagate Technology, LLC.
- The code contained herein is CONFIDENTIAL to Seagate Technology, LLC.
- Portions are also trade secret. Any use, duplication, derivation, distribution
- or disclosure of this code, for any reason, not expressly authorized is
- prohibited. All other rights are expressly reserved by Seagate Technology, LLC.
- ****************************************************************************
-"""
+# CORTX-Py-Utils: CORTX Python common library.
+# Copyright (c) 2020 Seagate Technology LLC and/or its Affiliates
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU Affero General Public License for more details.
+# You should have received a copy of the GNU Affero General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
+# For any questions about this software or licensing,
+# please email opensource@seagate.com or cortx-questions@seagate.com.
 
 import asyncio
 import os
 from typing import AnyStr
 import traceback
 
-from eos.utils.ha.dm.repository.decisiondb import DecisionDB
-from eos.utils.ha.dm.models.decisiondb import DecisionModel
-from eos.utils.ha.dm.actions import Action
-from eos.utils.ha.hac import const
-from eos.utils.schema.payload import Json
-from eos.utils.errors import DataAccessInternalError
-from eos.utils.log import Log
-from eos.utils.data.access import SortBy, SortOrder
+from cortx.utils.ha.dm.repository.decisiondb import DecisionDB
+from cortx.utils.ha.dm.models.decisiondb import DecisionModel
+from cortx.utils.ha.dm.actions import Action
+from cortx.utils.ha.hac import const
+from cortx.utils.schema.payload import Json
+from cortx.utils.errors import DataAccessInternalError
+from cortx.utils.log import Log
+from cortx.utils.data.access import SortBy, SortOrder
 
 class DecisionMonitor:
     """

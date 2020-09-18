@@ -19,8 +19,8 @@
                     "active": [ 1, 2]
                 },
                 "location": {
-                    "${HA_nodes_eosnode1}": "INFINITY",
-                    "${HA_nodes_eosnode2}": "INFINITY"
+                    "${HA_nodes_cortxnode1}": "INFINITY",
+                    "${HA_nodes_cortxnode2}": "INFINITY"
                 }
             }
         },
@@ -44,8 +44,8 @@
             "ha": {
                 "mode": "active_passive",
                 "location": {
-                    "${HA_nodes_eosnode1}": "INFINITY",
-                    "${HA_nodes_eosnode2}": "1000"
+                    "${HA_nodes_cortxnode1}": "INFINITY",
+                    "${HA_nodes_cortxnode2}": "1000"
                 }
             }
         },
@@ -69,8 +69,8 @@
             "ha": {
                 "mode": "active_passive",
                 "location": {
-                    "${HA_nodes_eosnode1}": "1000",
-                    "${HA_nodes_eosnode2}": "INFINITY"
+                    "${HA_nodes_cortxnode1}": "1000",
+                    "${HA_nodes_cortxnode2}": "INFINITY"
                 }
             }
         }

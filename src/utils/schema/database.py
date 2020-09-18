@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-# CORTX-Utils: CORTX Python common library.
+
+# CORTX-Py-Utils: CORTX Python common library.
 # Copyright (c) 2020 Seagate Technology LLC and/or its Affiliates
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published
@@ -37,7 +38,7 @@ DATABASE = {
         },
     "models": [
         {
-            "import_path": "eos.utils.ha.dm.models.decisiondb.DecisionModel",
+            "import_path": "cortx.utils.ha.dm.models.decisiondb.DecisionModel",
             "database": "consul_db",
             "config": {
                 "consul_db": {
@@ -46,7 +47,7 @@ DATABASE = {
             }
         },
         {
-            "import_path": "eos.utils.product_features.model.UnsupportedFeaturesModel",
+            "import_path": "cortx.utils.product_features.model.UnsupportedFeaturesModel",
             "database": "es_db",
             "config": {
                 "es_db": {

@@ -1,21 +1,19 @@
 #!/usr/bin/env python3
 
-"""
- ****************************************************************************
- Filename:          genrate.py
- Description:       Genarate HA rule for given HA framework target
-
- Creation Date:     03/13/2020
- Author:            Ajay Paratmandali
-
- Do NOT modify or remove this copyright and confidentiality notice!
- Copyright (c) 2001 - $Date: 2015/01/14 $ Seagate Technology, LLC.
- The code contained herein is CONFIDENTIAL to Seagate Technology, LLC.
- Portions are also trade secret. Any use, duplication, derivation, distribution
- or disclosure of this code, for any reason, not expressly authorized is
- prohibited. All other rights are expressly reserved by Seagate Technology, LLC.
- ****************************************************************************
-"""
+# CORTX-Py-Utils: CORTX Python common library.
+# Copyright (c) 2020 Seagate Technology LLC and/or its Affiliates
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU Affero General Public License for more details.
+# You should have received a copy of the GNU Affero General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
+# For any questions about this software or licensing,
+# please email opensource@seagate.com or cortx-questions@seagate.com.
 
 import os
 import json
@@ -25,9 +23,9 @@ import ast
 import copy
 from string import Template
 
-from eos.utils.schema.conf import Conf
-from eos.utils.schema.payload import *
-from eos.utils.ha.hac import const
+from cortx.utils.schema.conf import Conf
+from cortx.utils.schema.payload import *
+from cortx.utils.ha.hac import const
 
 class Generator:
     def __init__(self, compiled_file, output_file, args_file):
@@ -151,9 +149,9 @@ class PCSGenerator(Generator):
             "pcs -f $cluster_cfg resource clone $resource "+
             "clone-max=$clone_max clone-node-max=$clone_node_max $param")
         self._primary_secondary = Template("echo $$pcs_status | grep -q $resource || "+
-            "pcs -f $cluster_cfg resource master $primary "+
+            "pcs -f $cluster_cfg resource primary $primary "+
             "$resource clone-max=$clone_max clone-node-max=$clone_node_max "+
-            "master-max=$primary_max master-node-max=$primary_node_max $param")
+            "primary-max=$primary_max primary-node-max=$primary_node_max $param")
         self._location = Template("echo $$pcs_location | grep -q $resource || "+
             "pcs -f $cluster_cfg constraint location $resource prefers $node=$score")
         self._order = Template("echo $$pcs_status | grep -q 'start $res1 then start $res2' || "+

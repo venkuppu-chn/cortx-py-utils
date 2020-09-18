@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 # CORTX-Utils: CORTX Python common library.
 # Copyright (c) 2020 Seagate Technology LLC and/or its Affiliates
 # This program is free software: you can redistribute it and/or modify
@@ -17,8 +18,8 @@
 import os
 import asyncio
 import unittest
-from eos.utils.schema.payload import Json
-from eos.utils.product_features.unsupported_features import UnsupportedFeaturesDB
+from cortx.utils.schema.payload import Json
+from cortx.utils.product_features.unsupported_features import UnsupportedFeaturesDB
 dir_path = os.path.dirname(os.path.realpath(__file__))
 file_path = os.path.join(dir_path, 'test_schema', 'test_unsupported_features_data.json')
 TEST_DATA = Json(file_path).load()

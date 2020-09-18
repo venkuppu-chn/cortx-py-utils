@@ -1,21 +1,35 @@
+# CORTX-Py-Utils: CORTX Python common library.
+# Copyright (c) 2020 Seagate Technology LLC and/or its Affiliates
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU Affero General Public License for more details.
+# You should have received a copy of the GNU Affero General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
+# For any questions about this software or licensing,
+# please email opensource@seagate.com or cortx-questions@seagate.com.
 HA:
     nodes:
-        eosnode1: $(echo $(pcs status | grep Online | awk '{print $3}'))
-        eosnode2: $(echo $(pcs status | grep Online | awk '{print $4}'))
+        cortxnode1: $(echo $(pcs status | grep Online | awk '{print $3}'))
+        cortxnode2: $(echo $(pcs status | grep Online | awk '{print $4}'))
     management:
         vip:
-            ip: $(salt "eosnode-1" pillar.get cluster:mgmt_vip  --output=json | grep ipaddr | awk '{print $2}' | sed  s/\"//g | sed s/\,//g)
-            nic: $(salt "eosnode-1" pillar.get cluster:mgmt_vip  --output=json | grep iface | awk '{print $2}' | sed  s/\"//g | sed s/\,//g)
-            netmask: $(salt "eosnode-1" pillar.get cluster:mgmt_vip  --output=json | grep subnet | awk '{print $2}' | sed  s/\"//g | sed s/\,//g)
+            ip: $(salt "cortxnode-1" pillar.get cluster:mgmt_vip  --output=json | grep ipaddr | awk '{print $2}' | sed  s/\"//g | sed s/\,//g)
+            nic: $(salt "cortxnode-1" pillar.get cluster:mgmt_vip  --output=json | grep iface | awk '{print $2}' | sed  s/\"//g | sed s/\,//g)
+            netmask: $(salt "cortxnode-1" pillar.get cluster:mgmt_vip  --output=json | grep subnet | awk '{print $2}' | sed  s/\"//g | sed s/\,//g)
     io:
         vip1:
-            ip: $(salt "eosnode-1" pillar.get cluster:eosnode-1  --output=json | grep roaming_ip | awk '{print $2}' | sed  s/\"//g | sed s/\,//g)
-            nic: $(salt "eosnode-1" pillar.get cluster:eosnode-1 --output=json | jq '.["eosnode-1"].network["data_nw"].iface[0]')
+            ip: $(salt "cortxnode-1" pillar.get cluster:cortxnode-1  --output=json | grep roaming_ip | awk '{print $2}' | sed  s/\"//g | sed s/\,//g)
+            nic: $(salt "cortxnode-1" pillar.get cluster:cortxnode-1 --output=json | jq '.["cortxnode-1"].network["data_nw"].iface[0]')
             netmask: 24
             iflabel: "c1"
         vip2:
-            ip: $(salt "eosnode-1" pillar.get cluster:eosnode-2  --output=json | grep roaming_ip | awk '{print $2}' | sed  s/\"//g | sed s/\,//g)
-            nic: $(salt "eosnode-1" pillar.get cluster:eosnode-1 --output=json | jq '.["eosnode-1"].network["data_nw"].iface[1]')
+            ip: $(salt "cortxnode-1" pillar.get cluster:cortxnode-2  --output=json | grep roaming_ip | awk '{print $2}' | sed  s/\"//g | sed s/\,//g)
+            nic: $(salt "cortxnode-1" pillar.get cluster:cortxnode-1 --output=json | jq '.["cortxnode-1"].network["data_nw"].iface[1]')
             netmask: 24
             iflabel: "c2"
         lnet1:

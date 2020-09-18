@@ -1,21 +1,19 @@
 #!/usr/bin/env python3
 
-"""
- ****************************************************************************
- Filename:          compile.py
- Description:       Verify and Compile ha_spec
-
- Creation Date:     03/13/2020
- Author:            Ajay Paratmandali
-
- Do NOT modify or remove this copyright and confidentiality notice!
- Copyright (c) 2001 - $Date: 2015/01/14 $ Seagate Technology, LLC.
- The code contained herein is CONFIDENTIAL to Seagate Technology, LLC.
- Portions are also trade secret. Any use, duplication, derivation, distribution
- or disclosure of this code, for any reason, not expressly authorized is
- prohibited. All other rights are expressly reserved by Seagate Technology, LLC.
- ****************************************************************************
-"""
+# CORTX-Py-Utils: CORTX Python common library.
+# Copyright (c) 2020 Seagate Technology LLC and/or its Affiliates
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU Affero General Public License for more details.
+# You should have received a copy of the GNU Affero General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
+# For any questions about this software or licensing,
+# please email opensource@seagate.com or cortx-questions@seagate.com.
 
 import os
 import sys
@@ -23,9 +21,9 @@ import json
 import networkx as nx
 import matplotlib.pyplot as plt
 
-from eos.utils.ha.hac import const
-from eos.utils.ha.hac.validation import SyntaxValidator
-from eos.utils.ha.hac.validation import SymanticValidator
+from cortx.utils.ha.hac import const
+from cortx.utils.ha.hac.validation import SyntaxValidator
+from cortx.utils.ha.hac.validation import SymanticValidator
 
 class Compiler:
     def __init__(self, source_path, compile_file, ha_spec_file):

@@ -1,28 +1,25 @@
-"""
- ****************************************************************************
- Filename:          secure_storage.py
- Description:       Storage of explicitly AES encrypted objects upon Consul KVS
-
- Creation Date:     02/03/2019
- Author:            Alexander Voronov
-
- Do NOT modify or remove this copyright and confidentiality notice!
- Copyright (c) 2001 - $Date: 2015/01/14 $ Seagate Technology, LLC.
- The code contained herein is CONFIDENTIAL to Seagate Technology, LLC.
- Portions are also trade secret. Any use, duplication, derivation, distribution
- or disclosure of this code, for any reason, not expressly authorized is
- prohibited. All other rights are expressly reserved by Seagate Technology, LLC.
- ****************************************************************************
-"""
-
+# CORTX-Py-Utils: CORTX Python common library.
+# Copyright (c) 2020 Seagate Technology LLC and/or its Affiliates
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU Affero General Public License for more details.
+# You should have received a copy of the GNU Affero General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
+# For any questions about this software or licensing,
+# please email opensource@seagate.com or cortx-questions@seagate.com.
 
 from schematics.types import StringType
 
-from eos.utils.security.cipher import Cipher
-from eos.utils.data.access.base_model import BaseModel
-from eos.utils.data.access.filters import Compare
-from eos.utils.data.access.queries import Query
-from eos.utils.data.access.storage import AbstractDataBaseProvider
+from cortx.utils.security.cipher import Cipher
+from cortx.utils.data.access.base_model import BaseModel
+from cortx.utils.data.access.filters import Compare
+from cortx.utils.data.access.queries import Query
+from cortx.utils.data.access.storage import AbstractDataBaseProvider
 
 
 class NamedEncryptedBytes(BaseModel):
@@ -49,7 +46,7 @@ class NamedEncryptedBytes(BaseModel):
 
 class SecureStorage:
     """
-    Storage of explicitly EOS cipher encrypted objects upon Consul KVS
+    Storage of explicitly CORTX cipher encrypted objects upon Consul KVS
     """
 
     def __init__(self, storage: AbstractDataBaseProvider, key: bytes) -> None:
@@ -71,7 +68,7 @@ class SecureStorage:
         """
         Saves the data to the encrypted storage
 
-        Data is AES encrypted with the default EOS cipher and stored
+        Data is AES encrypted with the default CORTX cipher and stored
         as Base64 encoded string with the provided name.
         Raises KeyError if an item with the provided name exists and "force" flag
         is not set.
@@ -91,8 +88,8 @@ class SecureStorage:
         """
         Gets bytes from the encrypted storage
 
-        Acquires the data from the storage and decrypts it with the default EOS cipher
-        Raises EosCipherInvalidToken if decryption fails.
+        Acquires the data from the storage and decrypts it with the default CORTX cipher
+        Raises CipherInvalidToken if decryption fails.
         """
 
         neb = await self._get_item(name)
